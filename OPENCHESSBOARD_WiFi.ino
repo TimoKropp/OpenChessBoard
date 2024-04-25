@@ -63,8 +63,7 @@ void loop() {
       
       delay(500);// make sure first move is catched by isr
       
-      is_game_running = true;
-      is_connecting = false;
+      setStatePlaying();
         
       while (is_game_running)
       {   

@@ -71,3 +71,9 @@ void setStateConnecting(void){
   currentGameID = "no";
   myturn = false;
 }
+
+
+void setStatePlaying(void){    
+  is_game_running = true;
+  is_connecting = false;
+}
