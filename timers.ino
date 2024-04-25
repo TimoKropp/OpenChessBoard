@@ -1,3 +1,4 @@
+
 /* ---------------------------------------
     interupt handler function. Changes LED states for booting and connection sequence.
     When game is running, this function periodically checks for the game status from
@@ -5,10 +6,6 @@
     @params[in] void
     @return void
 */
-
-#include <Ticker.h>
-
-Ticker timer;
 
 void timerCallback(void)
 {
@@ -38,14 +35,7 @@ void timerCallback(void)
     {
       DEBUG_SERIAL.print("Game Status: ");
       DEBUG_SERIAL.println(game_status);
-      is_game_running = false;
-      is_connecting  = true;
-      lastMove = "xx";
-      myMove = "xx";
-      moves = "no";
-      currentGameID = "no";
-      myturn = false;
-      isr_first_run = false;
+      setStateConnecting();
       return;
     }
 
@@ -53,7 +43,7 @@ void timerCallback(void)
     if (moves.length() > 3)
     {
       DEBUG_SERIAL.print("move received: ");
-      int startstr = moves.length() - 4; // Start index for last 4 characters
+      int startstr = moves.length() - 4; 
       lastMove = moves.substring(startstr);
       DEBUG_SERIAL.println(lastMove);
     }
@@ -62,10 +52,6 @@ void timerCallback(void)
     {
       myturn = true;
     }
-    else{
-      DEBUG_SERIAL.println("received move was played by me! (API response)");
-    }
-
   }
 }                   
 

@@ -1,24 +1,24 @@
 #include "OpenChessBoard.h"
 
-// WiFi variables
+// WiFi, and timer variables
 int status = WL_IDLE_STATUS;
-char server[] = "lichess.org";  // name address for lichess (using DNS)
-
 WiFiClientSecure StreamClient;
 WiFiClientSecure PostClient;
+Ticker timer;
 
 //lichess variables
+char server[] = "lichess.org"; 
 String username = "no";
 String currentGameID = "no";
 bool myturn = true;
 String lastMove = "no";
 String myMove = "no";
+String moves = "no";
 bool is_castling_allowed = true;
 
 // LED and state variables
 bool boot_flipstate = true;
 bool is_booting = true;
-bool isr_first_run = false;
 bool connect_flipstate = false;
 bool is_connecting = false;
 bool is_game_running = false;
@@ -26,11 +26,10 @@ bool is_game_running = false;
 
 void setup() {
 
-  //Initialize HW
-  //initHW();
+  initHW();
+  setStateBooting();
   isr_setup();
  
-  
 #if DEBUG == true
   //Initialize DEBUG_SERIAL and wait for port to open:
   DEBUG_SERIAL.begin(9600);
@@ -48,12 +47,7 @@ void setup() {
 
 void loop() {
 
-  is_booting = false;
-  is_connecting = true;
-  isr_first_run = false;
-  lastMove = "xx";
-  myMove = "ff";
-
+  setStateConnecting();
   DEBUG_SERIAL.println("\nConnected to Server...");
   
   if (StreamClient.connect(server, 443))

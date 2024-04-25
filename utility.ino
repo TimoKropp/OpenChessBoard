@@ -38,3 +38,36 @@ void checkCastling(String move_input) {
    }
   }  
 }
+
+
+/* ---------------------------------------
+ *  function to set booting state and initializes state variables
+ *  @params[in] void
+ *  @return void
+*/
+void setStateBooting(void){
+  is_game_running = false;
+  is_booting = false;
+  is_connecting = true;
+  lastMove = "xx";
+  myMove = "xx";
+  moves = "no";
+  currentGameID = "no";
+  myturn = false;
+}
+
+/* ---------------------------------------
+ *  function to set connecting state and initializes state variables
+ *  @params[in] void
+ *  @return void
+*/
+void setStateConnecting(void){
+  is_game_running = false;
+  is_booting = false;
+  is_connecting  = true;
+  lastMove = "xx";
+  myMove = "xx";
+  moves = "no";
+  currentGameID = "no";
+  myturn = false;
+}
