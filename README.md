@@ -2,24 +2,20 @@
 The OPENCHESSBOARD is an open-source smart chess board to play online chess on a physical chess board. 
 Check out how it works in this video.<br/>
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/PFouUxKJOSc/0.jpg)](https://www.youtube.com/watch?v=PFouUxKJOSc)
-# OPENCHESSBOARD v1.0.1
+# OPENCHESSBOARD v2.0
 Currently the board is linked to your account on Lichess.org and directly connects to any ongoing game. You can use the Lichess browser application or your smartphone app to start a game from your account. When the board finds a new ongoing game, the board serves as input device and directly sends the move inputs to the Lichess server over a secure WiFi connection (SSL).
 
 # Requirements
-This project runs on Arduino Nano 33 IoT with the OPENCHESSBOARD hardware. You can order the PCBA (inlcuding Arduino Nano 33 IoT) from [OPENCHESSBOARD.com](http://openchessboard.com/).
+This project runs on Arduino Nano esp32 with the OPENCHESSBOARD hardware. You can order the PCBA (inlcuding Arduino esp32 (the Nano 33 IoT is also supported)) from [OPENCHESSBOARD.com](http://openchessboard.com/).
 
 ## Setup
 ### 1. Download the Arduino IDE
 Get the latest version [here](https://www.arduino.cc/en/software).
-### 2. Install WiFiNINA
-Install [WiFiNINA](https://www.arduino.cc/reference/en/libraries/wifinina) latest version from Arduino IDE's built-in [Library Manager](https://docs.arduino.cc/software/ide-v2/tutorials/ide-v2-installing-a-library).
-### 3. Import .ino files from this repository
+### 2. Import .ino files from this repository
 Download this project and import files with the Arduino IDE.
-### 4. Update certificate for SSL connection of the WiFi module
-Update the WiFi module to the latest WiFi firmware and add the lichess.org:443 (instead of google.com:443) root certificate as shown in this [example](https://support.arduino.cc/hc/en-us/articles/360016119219-How-to-add-certificates-to-Wifi-Nina-Wifi-101-Modules-).
-### 5. Link the OpenChessBoard to your Lichess account
+### 3. Link the OpenChessBoard to your Lichess account
 Generate an API token [here](https://lichess.org/account/oauth/token).
-### 6. Change your login data in OpenChessBoard.ino
+### 4. Change your login data in settings.h
 Input your personal WiFi login credentials as well as your Lichess token.
 
 ## How to play
