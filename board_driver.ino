@@ -141,11 +141,23 @@ void readHall(byte read_hall_array[]) {
  *  @params[in] void
  *  @return String move_input
 */  
+
 String getMoveInput(void) {
   const char columns[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
-
   String mvInput;
 
+  #ifdef MANUAL_MOVE_INPUT
+    DEBUG_SERIAL.println("Enter a move with keyboard:");
+    // Wait here until data is available
+
+    while (!Serial.available() && is_game_running) {
+        delay(10); // Small delay to prevent the loop from consuming too much CPU time
+    }
+
+    // Read input when data is available and newline is entered
+    mvInput = Serial.readStringUntil('\n');
+    mvInput.trim(); // Removes any whitespace or newline characters at the start or end
+  #else
   byte hallBoardStateInit[8];
   byte hallBoardState1[8];
   byte hallBoardState2[8];
@@ -168,7 +180,7 @@ String getMoveInput(void) {
   readHall(hallBoardStateInit);
 
 // wait for Start move event
-  while (!mvStarted) {
+  while (!mvStarted && is_game_running) {
     readHall(hallBoardState1);
 
     for (int row_index = 0; row_index < 8; row_index++) {
@@ -196,7 +208,7 @@ String getMoveInput(void) {
   digitalWrite(LED_OE_N_PIN , 0);
 
 // wait for end move event
-  while (!mvFinished ) {
+  while (!mvFinished  && is_game_running) {
     readHall(hallBoardState2);
     delay(100);
     readHall(hallBoardState3);
@@ -231,7 +243,8 @@ String getMoveInput(void) {
   digitalWrite(LED_LATCH_PIN, 1);
   digitalWrite(LED_OE_N_PIN , 0);
   delay(300);
-  
+  #endif
+
   return mvInput;
 
 }

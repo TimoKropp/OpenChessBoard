@@ -5,7 +5,12 @@
     @params[in] void
     @return void
 */
-void TC4_Handler(void)
+
+#include <Ticker.h>
+
+Ticker timer;
+
+void timerCallback(void)
 {
 
   if (is_booting)
@@ -15,47 +20,44 @@ void TC4_Handler(void)
   }
 
   if (is_connecting)
-  {   
+  { 
     displayConnectWait();
     connect_flipstate = !connect_flipstate;
   }
 
   if (is_game_running && !is_booting && !is_connecting)
   {
+    
+    char* char_response = catchResponseFromClient(StreamClient);
 
-    char char_response[800] = {0};
-     
-    while (StreamClient.available()) {
-      char_response[800] = {0};
-      StreamClient.readBytesUntil('\n', char_response, sizeof(char_response));
-    }
+    String moves = parseValueFromResponse(char_response, "moves");
+    String game_status = parseValueFromResponse(char_response, "status");
 
-    String game_status_str  = GetStringBetweenStrings((String)char_response, "status", "winner");
-    String moves  = GetStringBetweenStrings((String)char_response, "moves", "wtime");
-
-    String game_status = game_status_str.substring(3, 10);
-
-    if (game_status != "started" && game_status_str != NULL)
+    // Detect Game restart
+    if (game_status != "started" && game_status != "no")
     {
       DEBUG_SERIAL.print("Game Status: ");
       DEBUG_SERIAL.println(game_status);
       is_game_running = false;
       is_connecting  = true;
       lastMove = "xx";
-      myMove = "ff";
-      currentGameID = NULL;
-      myturn = true;
+      myMove = "xx";
+      moves = "no";
+      currentGameID = "no";
+      myturn = false;
       isr_first_run = false;
+      return;
     }
-    
+
+    // Check Move
     if (moves.length() > 3)
     {
       DEBUG_SERIAL.print("move received: ");
-      int startstr = moves.length() - 7;
-      int endstr =  moves.length() - 3;
-      lastMove = moves.substring(startstr, endstr);
+      int startstr = moves.length() - 4; // Start index for last 4 characters
+      lastMove = moves.substring(startstr);
       DEBUG_SERIAL.println(lastMove);
     }
+    
     if (lastMove != myMove)
     {
       myturn = true;
@@ -63,14 +65,10 @@ void TC4_Handler(void)
     else{
       DEBUG_SERIAL.println("received move was played by me! (API response)");
     }
-    
-    isr_first_run = true; // make sure isr is run once before finishing the main loop  
-    
+
   }
+}                   
 
-  TC4->COUNT32.INTFLAG.reg = TC_INTFLAG_OVF;             // Clear the OVF interrupt flag
-
-}
 
 
 /* ---------------------------------------
@@ -80,26 +78,13 @@ void TC4_Handler(void)
     @return void
 */
 void isr_setup(void) {
+  timer.attach(0.3, timerCallback);
+}
 
-  GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN |                 // Enable GCLK0 for TC4 and TC5
-                      GCLK_CLKCTRL_GEN_GCLK1 |             // Select GCLK0 at 48MHz
-                      GCLK_CLKCTRL_ID_TC4_TC5;             // Feed GCLK0 output to TC4 and TC5
-  while (GCLK->STATUS.bit.SYNCBUSY);                       // Wait for synchronization
+void disableISR() {
+  timer.detach(); // This will stop the timer from calling the callback
+}
 
-  TC4->COUNT32.CC[0].reg = 200000;                          // Set the TC4 CC0 register as the TOP value in match frequency mode
-  while (TC4->COUNT32.STATUS.bit.SYNCBUSY);                // Wait for synchronization
-
-  NVIC_SetPriority(TC4_IRQn, 0);    // Set the Nested Vector Interrupt Controller (NVIC) priority for TC4 to 0 (highest)
-  NVIC_EnableIRQ(TC4_IRQn);         // Connect TC4 to Nested Vector Interrupt Controller (NVIC)
-
-  TC4->COUNT32.INTENSET.reg = TC_INTENSET_OVF;             // Enable TC4 overflow (OVF) interrupts
-
-  TC4->COUNT32.CTRLA.reg |= TC_CTRLA_PRESCSYNC_PRESC |     // Reset timer on the next prescaler clock
-                            TC_CTRLA_PRESCALER_DIV8 |      // Set prescaler to 8, 48MHz/8 = 6MHz
-                            TC_CTRLA_WAVEGEN_MFRQ |        // Put the timer TC4 into match frequency (MFRQ) mode
-                            TC_CTRLA_MODE_COUNT32;         // Set the timer to 16-bit mode
-  while (TC4->COUNT32.STATUS.bit.SYNCBUSY);                // Wait for synchronization
-
-  TC4->COUNT32.CTRLA.bit.ENABLE = 1;                       // Enable the TC4 timer
-  while (TC4->COUNT32.STATUS.bit.SYNCBUSY);                // Wait for synchronization
+void enableISR() {
+  timer.attach(0.3, timerCallback); // This will re-enable the timer callback
 }

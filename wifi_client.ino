@@ -6,34 +6,16 @@
  *  @return void
 */
 void wifi_setup(void){
-  
-  // check for the WiFi module:
-  if (WiFi.status() == WL_NO_MODULE) {
-    DEBUG_SERIAL.println("Communication with WiFi module failed!");
-    DEBUG_SERIAL.println("Wifi Failed");
-    // don't continue
-    while (true);
-  }
-  
-  String fv = WiFi.firmwareVersion();
-  
-  if (fv < WIFI_FIRMWARE_LATEST_VERSION) {
-    DEBUG_SERIAL.println("Please upgrade the firmware");
-  }
 
-  DEBUG_SERIAL.println("Attempting wifi");
-  DEBUG_SERIAL.println("connection ...");
-  // attempt to connect to WiFi network:
-  while (status != WL_CONNECTED) {
-    DEBUG_SERIAL.print("Attempting to connect to SSID: ");
-    DEBUG_SERIAL.println(ssid);
-    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
-    status = WiFi.begin(ssid, pass);
-    // wait 1 seconds for connection:
-    delay(300);
-  }
-  DEBUG_SERIAL.println("Connected to wifi");
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
+  DEBUG_SERIAL.print("Connecting to Wifi");
+  while (WiFi.status() != WL_CONNECTED) {
+      delay(100);
+      DEBUG_SERIAL.print(".");
+  }
+  DEBUG_SERIAL.println("");
+  
   printWiFiStatus();
   }
 

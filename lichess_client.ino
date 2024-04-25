@@ -4,8 +4,8 @@
  *  @params[in] WiFiSSLClient
  *  @return void
 */
-void postMove(WiFiSSLClient &client) {
-          while (myturn && is_game_running)
+void postMove(WiFiClientSecure  &client) {
+  while (myturn && is_game_running)
           {
             clearDisplay();
             String move_input = getMoveInput();
@@ -14,13 +14,17 @@ void postMove(WiFiSSLClient &client) {
             DEBUG_SERIAL.println(move_input);
           
             myMove = move_input;
-            
-            TC4->COUNT32.CTRLA.bit.ENABLE = 0;
+            if(is_game_running){
 
-            if(!client.connected()){
-              client.connect(server, 443); 
+              disableISR();
+      
+              if (!client.connected()) {
+                  client.connect(server, 443);
+              }
             }
-
+            else{
+              break;
+            }
             client.print("POST /api/board/game/");
             client.print((String)currentGameID);
             client.print("/move/");
@@ -28,31 +32,24 @@ void postMove(WiFiSSLClient &client) {
             client.println(" HTTP/1.1");
             client.println("Host: lichess.org");
             client.print("Authorization: Bearer ");
-            client.println(token);
+            client.println(LICHESS_API_TOKEN);
             client.println("Connection: close");
-            client.println();
+            client.println("\n");
+            delay(100);
+            char* char_response = catchResponseFromClient(client);
+            DEBUG_SERIAL.println(char_response);
+            String moveSuccess = parseValueFromResponse(char_response, "ok");        
             
-            delay(500);
-
-            processHTTP(client);
-
-            DynamicJsonDocument doc(1024);
-            DeserializationError error = deserializeJson(doc, client);
-
             client.stop();
-              
-            //check for sucessful move
-            boolean moveSuccess = false;
-            moveSuccess = doc["ok"];
-            if (moveSuccess == true) {
+            if (moveSuccess == "true") {
               DEBUG_SERIAL.println("move success!");
               myturn = false;
               client.connect(server, 443);
-              TC4->COUNT32.CTRLA.bit.ENABLE = 1; 
+              enableISR(); 
             }
             else
-            {    
-                TC4->COUNT32.CTRLA.bit.ENABLE = 1;             
+            {   
+                enableISR();             
                 DEBUG_SERIAL.println("wrong move!");       
                 displayMove(myMove);
                 String reverse_move =  (String)myMove.charAt(2) 
@@ -68,48 +65,8 @@ void postMove(WiFiSSLClient &client) {
                 }
             }
           }
-          
-
+      
 }
-
-/* ---------------------------------------
- *  Function to send get username move request to Lichess API.
- *  Sets requested username to global variable username.
- *  @params[in] WiFiSSLClient
- *  @return void
-*/
-void getUsername(WiFiSSLClient &client){
-     DEBUG_SERIAL.println("connected to server in setup");
-    // SETUP API: MAKE A REQUEST TO DOWNLOAD THE CURRENT USER'S LICHESS USERNAME
-    client.println("GET /api/account HTTP/1.1");
-    client.println("Host: lichess.org");
-    // Include an authorisation header with the lichess API token
-    client.print("Authorization: Bearer ");
-    client.println(token);
-    delay(100); 
-
-    processHTTP(client);
-
-    DynamicJsonDocument doc(1536);
-    DeserializationError error = deserializeJson(doc, client);
-    if (error)
-    {
-      DEBUG_SERIAL.print(F("deserializeJson() failed: "));
-      DEBUG_SERIAL.println(error.f_str());
-      return;
-    }
-    DEBUG_SERIAL.println(F("Connected to User:"));
-
-    username = doc["username"];
-    DEBUG_SERIAL.println(username);
-    
-    //close request
-    client.println("Connection: close");
-    client.println();
-    if (username != NULL) {
-      delay(100); // slow down to not spam requests
-    }
-  }
 
 /* ---------------------------------------
  *  Function to send get stream request to Lichess API.
@@ -117,19 +74,28 @@ void getUsername(WiFiSSLClient &client){
  *  @params[in] WiFiSSLClient
  *  @return void
 */  
-void getStream(WiFiSSLClient &client){
+void getStream(WiFiClientSecure  &client){
     client.print("GET /api/board/game/stream/");
     client.print((String)currentGameID);
     client.println(" HTTP/1.1");
     client.println("Host: lichess.org");
     client.print("Authorization: Bearer ");
-    client.println(token);
-    client.println("Connection: close");
-    client.println();
-    delay(500);  
-    processHTTP(client);
+    client.println(LICHESS_API_TOKEN);
+    client.println("Connection: keep-alive");
+    client.println("\n");
   } 
 
+void disableClient(WiFiClientSecure  &client){
+    client.println("GET /api/account/playing HTTP/1.1");
+    client.println("Host: lichess.org");
+    client.print("Authorization: Bearer ");
+    client.println(LICHESS_API_TOKEN);
+    client.println("Connection: close");
+    client.println("\n"); 
+    char* char_response = catchResponseFromClient(client);
+    client.flush();
+    client.stop();
+  } 
 
 /* ---------------------------------------
  *  Function to send get gameID request to Lichess API.
@@ -137,62 +103,85 @@ void getStream(WiFiSSLClient &client){
  *  @params[in] WiFiSSLClient
  *  @return void
 */       
-void getGameID(WiFiSSLClient &client){
+void getGameID(WiFiClientSecure  &client){
+    // Request setup
     client.println("GET /api/account/playing HTTP/1.1");
     client.println("Host: lichess.org");
     client.print("Authorization: Bearer ");
-    client.println(token);
-    delay(100); 
-    
-    processHTTP(client);
+    client.println(LICHESS_API_TOKEN);
+    client.println("Connection: keep-alive");
+    client.println("\n"); 
 
-    DynamicJsonDocument doc(1536);
-    DeserializationError error = deserializeJson(doc, client);
-    if (error)
-    {
-      DEBUG_SERIAL.print(F("deserializeJson() failed: "));
-      DEBUG_SERIAL.println(error.f_str());
-      return;
+    // Buffer to hold the response
+    char* char_response = catchResponseFromClient(client);
+    currentGameID = parseValueFromResponse(char_response, "gameId");
+    DEBUG_SERIAL.print("current game id: ");
+    DEBUG_SERIAL.println(currentGameID);
+    myturn = parseValueFromResponse(char_response, "isMyTurn");
+    DEBUG_SERIAL.print("my turn: ");
+    DEBUG_SERIAL.println(myturn);
+}
+
+char* catchResponseFromClient(WiFiClientSecure &client) {
+    static char char_response[2024] = {0}; 
+
+    while (!client.available()) {
+        delay(1);
     }
 
-    JsonObject nowPlaying_0 = doc["nowPlaying"][0];
-    JsonObject nowPlaying_0_opponent = nowPlaying_0["opponent"];
-    currentGameID = nowPlaying_0["gameId"];
-    myturn = nowPlaying_0["isMyTurn"];
-    
-    DEBUG_SERIAL.println(currentGameID);
+    size_t length = 0;
+    while (client.available() && length < sizeof(char_response) - 1) {
+        char c = client.read();
+        char_response[length++] = c;
+    }
+    char_response[length] = '\0'; 
+    return char_response; 
 }
 
 
-/* ---------------------------------------
- *  Function to evaluate http requests on wifi client.
- *  Generic function that checks for http status and skips headers
- *  @params[in] WiFiSSLClient
- *  @return void
-*/   
-void processHTTP(WiFiSSLClient client) {
-  if (client.println() == 0) {
-    return;
-  }
+String parseValueFromResponse(const char* response, const char* key) {
+    static char valueBuffer[256]; 
+    // Clear the buffer before use
+    memset(valueBuffer, 0, sizeof(valueBuffer));
 
-  char status[64] = {0};
-  client.readBytesUntil('\r', status, sizeof(status));
+    String strResponse = String(response); 
 
-  // It should be "HTTP/1.0 200 OK"
-  if (strcmp(status + 9, "200 OK") != 0) {
-    DEBUG_SERIAL.print(F("Unexpected response: "));
-    DEBUG_SERIAL.println(status);
-    if (strcmp(status + 9, "400 Bad Request") == 0) {
-      //catch bad request
+    int jsonStart = strResponse.indexOf('{');
+    if (jsonStart == -1) {
+        DEBUG_SERIAL.println("JSON start not found.");
+        return "no"; // Return NULL if no JSON object is found
     }
-    else {
-      return;
+    strResponse = strResponse.substring(jsonStart); 
+
+    String keyString = "\"" + String(key) + "\":";
+    int keyStart = strResponse.indexOf(keyString);
+    if (keyStart == -1) {
+        DEBUG_SERIAL.print(key);
+        DEBUG_SERIAL.println(" not found.");
+        return "no"; 
     }
-  }
-  // Skip HTTP headers
-  char endOfHeaders[] = "\r\n\r\n";
-  if (!client.find(endOfHeaders)) {
-    DEBUG_SERIAL.println(F("Invalid response"));
-    return;
-  }
+    keyStart += keyString.length(); 
+
+    int valueEnd = strResponse.indexOf(',', keyStart);
+    if (valueEnd == -1) {
+        valueEnd = strResponse.indexOf('}', keyStart);
+    }
+    if (valueEnd == -1) {
+        valueEnd = strResponse.length(); 
+    }
+
+    String value = strResponse.substring(keyStart, valueEnd);
+
+    value.trim(); 
+
+    if (value.startsWith("\"")) {
+        value = value.substring(1);
+    }
+    if (value.endsWith("\"") || value.endsWith("}")) {
+        value = value.substring(0, value.length() - 1);
+    }
+
+    value.toCharArray(valueBuffer, sizeof(valueBuffer));
+
+    return value; 
 }
