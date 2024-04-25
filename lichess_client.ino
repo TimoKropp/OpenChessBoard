@@ -1,7 +1,7 @@
 /* ---------------------------------------
  *  Function to send post move request to Lichess API.
  *  Restarts client and stops client after request 
- *  @params[in] WiFiSSLClient
+ *  @params[in] WiFiClientSecure
  *  @return void
 */
 void postMove(WiFiClientSecure  &client) {
@@ -71,7 +71,7 @@ void postMove(WiFiClientSecure  &client) {
 /* ---------------------------------------
  *  Function to send get stream request to Lichess API.
  *  Starts the move stream on client.
- *  @params[in] WiFiSSLClient
+ *  @params[in] WiFiClientSecure
  *  @return void
 */  
 void getStream(WiFiClientSecure  &client){
@@ -100,7 +100,7 @@ void disableClient(WiFiClientSecure  &client){
 /* ---------------------------------------
  *  Function to send get gameID request to Lichess API.
  *  If game is found, global variable currentGameID is set  and sets turn global variable myturn
- *  @params[in] WiFiSSLClient
+ *  @params[in] WiFiClientSecure
  *  @return void
 */       
 void getGameID(WiFiClientSecure  &client){
@@ -112,8 +112,8 @@ void getGameID(WiFiClientSecure  &client){
     client.println("Connection: keep-alive");
     client.println("\n"); 
 
-    // Buffer to hold the response
     char* char_response = catchResponseFromClient(client);
+
     currentGameID = parseValueFromResponse(char_response, "gameId");
     DEBUG_SERIAL.print("current game id: ");
     DEBUG_SERIAL.println(currentGameID);
