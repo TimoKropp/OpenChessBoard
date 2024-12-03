@@ -1,3 +1,5 @@
+#include "openchessboard.h"
+
 //HW GPIO configuration
 
 int LED_MR_N_PIN = 4; // RESET, D4
@@ -103,6 +105,7 @@ void readHall(byte read_hall_array[]) {
 
   for (int row_index = 0; row_index < 8; row_index++)
   {
+
     bool bit0 = ((byte)row_index & (1 << 0)) != 0;
     bool bit1 = ((byte)row_index & (1 << 1)) != 0;
     bool bit2 = ((byte)row_index & (1 << 2)) != 0;
@@ -111,19 +114,19 @@ void readHall(byte read_hall_array[]) {
     digitalWrite(HALL_ROW_S2, bit2);
 
     for (int col_index = 0; col_index < 8; col_index++) {
+
         bool bit0 = ((byte)col_index & (1 << 0)) != 0;
         bool bit1 = ((byte)col_index & (1 << 1)) != 0;
         bool bit2 = ((byte)col_index & (1 << 2)) != 0;
         digitalWrite(HALL_OUT_S0, bit0);
         digitalWrite(HALL_OUT_S1, bit1);
         digitalWrite(HALL_OUT_S2, bit2);
-
-      //delayMicroseconds(10);
+        
+      delay(1);
       hall_val = analogRead(HALL_SENSE);
-      //delayMicroseconds(100);
-
-
-      if (hall_val < SENSE_THRS) {
+      //DEBUG_SERIAL.println(hall_val);
+ 
+      if (hall_val == 0) {
         read_hall_array[row_index] |= 1UL << (col_index);
       }
     }
@@ -389,6 +392,13 @@ void displayMove(String last_move) {
   digitalWrite(LED_MR_N_PIN, 1);
   digitalWrite(LED_LATCH_PIN, 0);
   shiftOut(led_test_array);
+  digitalWrite(LED_LATCH_PIN, 1);
+  digitalWrite(LED_OE_N_PIN , 0);
+}
+
+void displayArray(byte ledBoardState[]) {
+   digitalWrite(LED_LATCH_PIN, 0);
+  shiftOut(ledBoardState);
   digitalWrite(LED_LATCH_PIN, 1);
   digitalWrite(LED_OE_N_PIN , 0);
 }

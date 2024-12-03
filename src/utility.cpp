@@ -1,3 +1,4 @@
+#include "OpenChessBoard.h"
 /* ---------------------------------------
  *  function to get substring between string firstdel and enddel
  *  @params[in] void
@@ -76,4 +77,49 @@ void setStateConnecting(void){
 void setStatePlaying(void){    
   is_game_running = true;
   is_connecting = false;
+}
+
+String urlDecode(const String &encoded) {
+  String decoded = "";
+  char ch;
+  int i = 0;
+  while (i < encoded.length()) {
+    ch = encoded.charAt(i);
+    if (ch == '%') {
+      // Get the next two characters after %
+      String hexCode = encoded.substring(i + 1, i + 3);
+      decoded += (char) strtol(hexCode.c_str(), NULL, 16);
+      i += 3;
+    } else if (ch == '+') {
+      // Decode the + as a space
+      decoded += ' ';
+      i++;
+    } else {
+      decoded += ch;
+      i++;
+    }
+  }
+  return decoded;
+}
+
+void readSettings(void){
+  preferences.begin("settings", false);  // Open "settings" namespace, read-write mode
+  
+  // Check if parameters exist and read from the preferences
+  if (preferences.isKey("ssid")) {
+
+    wifi_ssid = preferences.getString("ssid", "");
+    wifi_password = preferences.getString("password", "");
+    lichess_api_token = preferences.getString("token", "");
+    board_gameMode = preferences.getString("gameMode", "");
+    board_startupType = preferences.getString("startupType", "");
+    DEBUG_SERIAL.println("Settings Loaded from Flash:");
+    DEBUG_SERIAL.println("SSID: " + wifi_ssid);
+    DEBUG_SERIAL.println("Password: " + wifi_password);
+    DEBUG_SERIAL.println("Token: " + lichess_api_token);
+    DEBUG_SERIAL.println("Game Mode: " + urlDecode(board_gameMode));
+    DEBUG_SERIAL.println("Startup Type: " + board_startupType);
+  } else {
+    Serial.println("No settings found, using default values.");
+  }
 }

@@ -1,9 +1,9 @@
 #pragma once
 
 //Secret data, change to your credentials!
-#define WIFI_SSID "my_wifi_ssid"                    // your network SSID (name), must be 2.4 GHz WiFi!!!
-#define WIFI_PASSWORD "my_password"               // your network password
-#define LICHESS_API_TOKEN "my_token"  // your Lichess API token, generated with all rights enabled (all sliders set to green)
+#define WIFI_SSID "Oioioi2.4"                    // your network SSID (name), must be 2.4 GHz WiFi!!!
+#define WIFI_PASSWORD "1208salat!"               // your network password
+#define LICHESS_API_TOKEN "lip_LtPxNcQ0ccxTMs1LsIZ2"  // your Lichess API token, generated with all rights enabled (all sliders set to green)
 /*Note: When generating your token, make sure to provide all rights (all sliders set to green) */
 
 /*

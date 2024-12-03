@@ -1,4 +1,6 @@
 
+#include "openchessboard.h"
+
 /* ---------------------------------------
     interupt handler function. Changes LED states for booting and connection sequence.
     When game is running, this function periodically checks for the game status from

@@ -1,3 +1,4 @@
+#include "openchessboard.h"
 /* ---------------------------------------
  *  Function to send post move request to Lichess API.
  *  Restarts client and stops client after request 
