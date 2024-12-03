@@ -15,6 +15,8 @@
 #include "ble_app.h"
 #include "wifi_app.h"
 #include <ArduinoOTA.h>
+#include <esp_ota_ops.h>
+
 
 // Debug Settings
 //#define MANUAL_MOVE_INPUT

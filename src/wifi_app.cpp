@@ -33,7 +33,8 @@ void run_WiFi_app(void){
  
   wifi_setup();
   wifi_firmwareUpdate();
-
+  while(1){
+  }
   PostClient.setCACert(rootCA);
   StreamClient.setCACert(rootCA);
   DEBUG_SERIAL.println("\nStarting connection to server...");
@@ -45,6 +46,9 @@ void run_WiFi_app(void){
     
     if (StreamClient.connect(server, 443))
     {
+        if (board_gameMode != "None"){
+// start new game
+        }
         DEBUG_SERIAL.println("Find ongoing game");
         
         getGameID(StreamClient); // checks whos turn it is

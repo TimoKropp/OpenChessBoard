@@ -108,16 +108,16 @@ void readSettings(void){
   // Check if parameters exist and read from the preferences
   if (preferences.isKey("ssid")) {
 
-    wifi_ssid = preferences.getString("ssid", "");
-    wifi_password = preferences.getString("password", "");
-    lichess_api_token = preferences.getString("token", "");
-    board_gameMode = preferences.getString("gameMode", "");
+    wifi_ssid = urlDecode(preferences.getString("ssid", ""));
+    wifi_password = urlDecode(preferences.getString("password", ""));
+    lichess_api_token = urlDecode(preferences.getString("token", ""));
+    board_gameMode = urlDecode(preferences.getString("gameMode", ""));
     board_startupType = preferences.getString("startupType", "");
     DEBUG_SERIAL.println("Settings Loaded from Flash:");
     DEBUG_SERIAL.println("SSID: " + wifi_ssid);
     DEBUG_SERIAL.println("Password: " + wifi_password);
     DEBUG_SERIAL.println("Token: " + lichess_api_token);
-    DEBUG_SERIAL.println("Game Mode: " + urlDecode(board_gameMode));
+    DEBUG_SERIAL.println("Game Mode: " + board_gameMode);
     DEBUG_SERIAL.println("Startup Type: " + board_startupType);
   } else {
     Serial.println("No settings found, using default values.");

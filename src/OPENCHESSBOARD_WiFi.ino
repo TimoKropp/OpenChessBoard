@@ -8,9 +8,10 @@ String board_startupType;
 void setup() {
 
   initHW();
+
   setStateBooting();
   isr_setup();
- 
+
 #if DEBUG == true
   //Initialize DEBUG_SERIAL and wait for port to open:
   DEBUG_SERIAL.begin(9600);

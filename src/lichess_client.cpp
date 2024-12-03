@@ -81,7 +81,7 @@ void getStream(WiFiClientSecure  &client){
     client.println(" HTTP/1.1");
     client.println("Host: lichess.org");
     client.print("Authorization: Bearer ");
-    client.println(LICHESS_API_TOKEN);
+    client.println(lichess_api_token);
     client.println("Connection: keep-alive");
     client.println("\n");
   } 
@@ -90,7 +90,7 @@ void disableClient(WiFiClientSecure  &client){
     client.println("GET /api/account/playing HTTP/1.1");
     client.println("Host: lichess.org");
     client.print("Authorization: Bearer ");
-    client.println(LICHESS_API_TOKEN);
+    client.println(lichess_api_token);
     client.println("Connection: close");
     client.println("\n"); 
     char* char_response = catchResponseFromClient(client);
@@ -109,7 +109,7 @@ void getGameID(WiFiClientSecure  &client){
     client.println("GET /api/account/playing HTTP/1.1");
     client.println("Host: lichess.org");
     client.print("Authorization: Bearer ");
-    client.println(LICHESS_API_TOKEN);
+    client.println(lichess_api_token);
     client.println("Connection: keep-alive");
     client.println("\n"); 
 
@@ -185,4 +185,8 @@ String parseValueFromResponse(const char* response, const char* key) {
     value.toCharArray(valueBuffer, sizeof(valueBuffer));
 
     return value; 
+}
+
+void postNewGame(WiFiClientSecure  &client, String timeControl) {
+
 }
