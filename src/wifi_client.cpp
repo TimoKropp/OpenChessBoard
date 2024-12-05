@@ -86,7 +86,7 @@ String fetchMetaData(const char* metadata_url) {
 
 bool isNewVersionAvailable(String latest_version) {
   // Get stored version from Preferences
-  preferences.begin("versions", false); //read only 
+  preferences.begin("versions", false); 
   String current_version = preferences.getString("firmware_version", "0.0.0");
   preferences.end();
   Serial.printf("Current Version: %s, Latest Version: %s\n", current_version.c_str(), latest_version.c_str());

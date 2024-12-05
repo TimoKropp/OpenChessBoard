@@ -108,7 +108,6 @@ void readSettings(void){
   
   // Check if parameters exist and read from the preferences
   if (preferences.isKey("ssid")) {
-
     wifi_ssid = urlDecode(preferences.getString("ssid", ""));
     wifi_password = urlDecode(preferences.getString("password", ""));
     lichess_api_token = urlDecode(preferences.getString("token", ""));
@@ -123,4 +122,5 @@ void readSettings(void){
   } else {
     Serial.println("No settings found, using default values.");
   }
+  preferences.end();
 }
