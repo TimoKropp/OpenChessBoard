@@ -125,4 +125,41 @@ void readSettings(void){
     Serial.println("No settings found, using default values.");
   }
   preferences.end();
-} 
+}
+
+void readBoardSelection(){
+  byte read_hall_array[8];
+  byte pattern1[8];
+  byte pattern2[8];
+  byte pattern3[8];
+  memset(pattern1, 0x00, sizeof(pattern1));
+  memset(pattern2, 0x00, sizeof(pattern2));
+  memset(pattern3, 0x00, sizeof(pattern2));
+
+  pattern1[7] =0xC2; // remove piece on a1 to select this
+
+  pattern2[6] =0xC2; // remove piece on b1 to select this
+  
+  pattern2[5] =0xC2; // remove piece on c1 to select this
+
+  readHall(read_hall_array);
+    Serial.print("read_hall_array: ");
+  for (int i = 0; i < 8; i++) {
+      Serial.print(read_hall_array[i], HEX); // Print each byte in hexadecimal
+      if (i < 8 - 1) {
+          Serial.print(", "); // Add comma between elements
+      }
+  }
+    Serial.println(); // Newline at the end
+  if (memcmp(read_hall_array, pattern1, 8) == 0){
+    board_startupType = "WiFi";
+  }
+  else if (memcmp(read_hall_array, pattern2, 8) == 0)
+  {
+    board_startupType = "BLE";
+  }
+  else if (memcmp(read_hall_array, pattern3, 8) == 0)
+  {
+    board_startupType = "AP";
+  }
+}

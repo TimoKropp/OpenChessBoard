@@ -8,3 +8,4 @@ extern void setStateConnecting(void);
 extern void setStatePlaying(void);
 extern String urlDecode(const String &encoded);
 extern void readSettings(void);
+extern void readBoardSelection(void);

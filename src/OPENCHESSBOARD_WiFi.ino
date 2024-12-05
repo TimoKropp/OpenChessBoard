@@ -22,6 +22,7 @@ void setup() {
 #endif
 
 readSettings();
+readBoardSelection();
 
 if (board_startupType == "WiFi"){
    DEBUG_SERIAL.println("\nRun WiFi App...");   
