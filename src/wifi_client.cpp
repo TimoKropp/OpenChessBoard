@@ -63,7 +63,7 @@ String fetchMetaData(const char* metadata_url) {
   // Wait for response
   unsigned long timeout = millis();
   while (client.available() == 0) {
-    if (millis() - timeout > 10000) {  // 10 seconds timeout
+    if (millis() - timeout > 5000) {  // 5 seconds timeout
       Serial.println("Timeout waiting for response headers");
       client.stop();
       return "";
@@ -80,6 +80,7 @@ String fetchMetaData(const char* metadata_url) {
   String response = client.readString();
   client.stop();
   delay(1000);
+
   return response;
 }
 
@@ -100,7 +101,7 @@ bool isNewVersionAvailable(String latest_version) {
 bool fetchLatestVersion(String& latest_version) {   
     const char* url = "/TimoKropp/OPENCHESSBOARD_WiFi/main_nano_esp32/release/version.json";
     const int maxRetries = 3;  // Maximum number of retries for both fetching and writing
-    const unsigned long retryDelay = 5000;  // Delay between retries in milliseconds
+    const unsigned long retryDelay = 3000;  // Delay between retries in milliseconds
     int fetchRetries = 0;
 
     String metadata;
@@ -237,11 +238,12 @@ bool downloadFirmware(String latest_version) {
                 }
 
                 if (Update.end() && Update.isFinished()) {
-                    Serial.println("Update finished. Rebooting...");
-                    delay(3000);
+
                     preferences.begin("firmware_version", false);
                     preferences.putString("firmware_version", latest_version);
-                    preferences.end();
+                    preferences.begin("firmware_version", true); // read only
+                    Serial.println("Update finished. Rebooting...");
+                    delay(3000);
                     ESP.restart();
                     return true;
                 } else {

@@ -103,7 +103,8 @@ String urlDecode(const String &encoded) {
 }
 
 void readSettings(void){
-  preferences.begin("settings", false);  // Open "settings" namespace, read-write mode
+
+  preferences.begin("settings", true);  // read only
   
   // Check if parameters exist and read from the preferences
   if (preferences.isKey("ssid")) {
