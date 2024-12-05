@@ -86,9 +86,9 @@ String fetchMetaData(const char* metadata_url) {
 
 bool isNewVersionAvailable(String latest_version) {
   // Get stored version from Preferences
-  preferences.begin("firmware_version", false); //read only 
+  preferences.begin("versions", false); //read only 
   String current_version = preferences.getString("firmware_version", "0.0.0");
-
+  preferences.end();
   Serial.printf("Current Version: %s, Latest Version: %s\n", current_version.c_str(), latest_version.c_str());
 
   // Compare versions
@@ -239,9 +239,9 @@ bool downloadFirmware(String latest_version) {
 
                 if (Update.end() && Update.isFinished()) {
 
-                    preferences.begin("firmware_version", false);
+                    preferences.begin("versions", false);
                     preferences.putString("firmware_version", latest_version);
-                    preferences.begin("firmware_version", true); // read only
+                    preferences.end();
                     Serial.println("Update finished. Rebooting...");
                     delay(3000);
                     ESP.restart();

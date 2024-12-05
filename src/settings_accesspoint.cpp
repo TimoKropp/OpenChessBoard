@@ -119,8 +119,7 @@ bool handleAPClientRequest(WiFiClient &client) {
         preferences.putString("token", token);
         preferences.putString("gameMode", gameMode);
         preferences.putString("startupType", startupType);
-
-        preferences.begin("settings", true); // read only
+        preferences.end();
 
         Serial.println("Settings Saved to Flash:");
         Serial.println("SSID: " + ssid);
