@@ -77,6 +77,7 @@ bool handleAPClientRequest(WiFiClient &client) {
                                 <input type='text' name='token' value='" + token + "'><br><br>\
                                 <label>Auto Start Game Time Control(WiFi):</label><br>\
                                 <select name='gameMode'>\
+                                  <option value='None'>None</option>\
                                   <option value='5+3'>5+3</option>\
                                   <option value='10+5'>10+5</option>\
                                   <option value='15+10'>15+10</option>\
