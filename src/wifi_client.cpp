@@ -268,7 +268,7 @@ void wifi_firmwareUpdate() {
     if (fetchLatestVersion(latest_version)){
       
       if (!isNewVersionAvailable(latest_version)) {
-          Serial.println("Firmware is not the latest.");
+          Serial.println("Firmware is up to date!");
           return;
       }
       else{

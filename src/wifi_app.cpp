@@ -8,7 +8,7 @@ bool is_booting = true;
 bool connect_flipstate = false;
 bool is_connecting = false;
 bool is_game_running = false;
-
+bool is_seeking = false;
 // WiFi, and timer variables
 String wifi_ssid;
 String wifi_password;
@@ -34,9 +34,7 @@ void run_WiFi_app(void){
   wifi_setup();
 
   wifi_firmwareUpdate();
-  while(1){
-    //DEBUG_SERIAL.println("\nwait...");
-  }
+
   PostClient.setCACert(rootCA);
   StreamClient.setCACert(rootCA);
   DEBUG_SERIAL.println("\nStarting connection to server...");
@@ -48,8 +46,11 @@ void run_WiFi_app(void){
     
     if (StreamClient.connect(server, 443))
     {
-        if (board_gameMode != "None"){
-// start new game
+        if (board_gameMode != "None"  && !is_seeking){
+
+          DEBUG_SERIAL.println("\nStart Game with prefered settings: "+ board_gameMode);   
+          postNewGame(PostClient,  board_gameMode);
+
         }
         DEBUG_SERIAL.println("Find ongoing game");
         

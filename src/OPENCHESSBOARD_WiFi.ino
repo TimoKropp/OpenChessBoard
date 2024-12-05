@@ -5,12 +5,14 @@
 String board_gameMode;
 String board_startupType;
 
+//#define PLUG_AT_TOP
+
 void setup() {
 
   initHW();
 
-  //setStateBooting();
-  //isr_setup();
+  setStateBooting();
+  isr_setup();
 
 #if DEBUG == true
   //Initialize DEBUG_SERIAL and wait for port to open:

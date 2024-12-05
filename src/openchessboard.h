@@ -47,6 +47,7 @@ extern bool is_booting;
 extern bool connect_flipstate;
 extern bool is_connecting;
 extern bool is_game_running;
+extern bool is_seeking;
 
 
 extern Preferences preferences;

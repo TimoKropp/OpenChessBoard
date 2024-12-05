@@ -74,7 +74,8 @@ void setStateConnecting(void){
 }
 
 
-void setStatePlaying(void){    
+void setStatePlaying(void){
+  is_seeking = false;    
   is_game_running = true;
   is_connecting = false;
 }
@@ -111,6 +112,7 @@ void readSettings(void){
     wifi_ssid = urlDecode(preferences.getString("ssid", ""));
     wifi_password = urlDecode(preferences.getString("password", ""));
     lichess_api_token = urlDecode(preferences.getString("token", ""));
+    lichess_api_token = "lip_Mw9rP2ir5k2qhwjFz3gl";
     board_gameMode = urlDecode(preferences.getString("gameMode", ""));
     board_startupType = preferences.getString("startupType", "");
     DEBUG_SERIAL.println("Settings Loaded from Flash:");
@@ -123,4 +125,4 @@ void readSettings(void){
     Serial.println("No settings found, using default values.");
   }
   preferences.end();
-}
+} 
