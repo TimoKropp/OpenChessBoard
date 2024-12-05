@@ -35,7 +35,7 @@ void run_WiFi_app(void){
 
   wifi_firmwareUpdate();
   while(1){
-    DEBUG_SERIAL.println("\nwait...");
+    //DEBUG_SERIAL.println("\nwait...");
   }
   PostClient.setCACert(rootCA);
   StreamClient.setCACert(rootCA);

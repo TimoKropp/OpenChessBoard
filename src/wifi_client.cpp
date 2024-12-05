@@ -85,11 +85,11 @@ String fetchMetaData(const char* metadata_url) {
 }
 
 bool isNewVersionAvailable(String latest_version) {
-  // Get stored version from Preferences
-  preferences.begin("versions", false); 
-  String current_version = preferences.getString("firmware_version", "0.0.0");
-  preferences.end();
-  Serial.printf("Current Version: %s, Latest Version: %s\n", current_version.c_str(), latest_version.c_str());
+
+    preferences.begin("settings", true);
+    String current_version = preferences.getString("firmware", "0.0.0");
+    preferences.end();
+    Serial.printf("Current Version: %s, Latest Version: %s\n", current_version.c_str(), latest_version.c_str());
 
   // Compare versions
   return (latest_version > current_version); 
@@ -239,8 +239,8 @@ bool downloadFirmware(String latest_version) {
 
                 if (Update.end() && Update.isFinished()) {
 
-                    preferences.begin("versions", false);
-                    preferences.putString("firmware_version", latest_version);
+                    preferences.begin("settings", false);
+                    preferences.putString("firmware", latest_version);
                     preferences.end();
                     Serial.println("Update finished. Rebooting...");
                     delay(3000);
