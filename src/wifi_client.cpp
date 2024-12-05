@@ -45,7 +45,7 @@ void printWiFiStatus(void) {
   DEBUG_SERIAL.println(" dBm");
 }
 
-String fetchLatestVersion(const char* metadata_url) {
+String fetchMetaData(const char* metadata_url) {
   WiFiClientSecure client;
   client.setInsecure();  // Disable SSL certificate validation
 
@@ -79,131 +79,209 @@ String fetchLatestVersion(const char* metadata_url) {
   // Read the JSON response
   String response = client.readString();
   client.stop();
-  Serial.println("Raw Response:");
-  Serial.println(response);  // This will show the exact response
+  delay(1000);
   return response;
 }
 
-bool isNewVersionAvailable(const String& json, String& firmware_url, String& latest_version) {
-  // Search for the "latest_version" key and extract the value
-  int versionIndex = json.indexOf("\"latest_version\":");
-  if (versionIndex == -1) {
-    Serial.println("Failed to find latest_version in JSON.");
-    return false;
-  }
-  
-  // Move the index to the value after the colon
-  versionIndex = json.indexOf("\"", versionIndex + 17);  // 17 is the length of `"latest_version":`
-  int endIndex = json.indexOf("\"", versionIndex + 1);
-  
-  if (versionIndex == -1 || endIndex == -1) {
-    Serial.println("Failed to extract version.");
-    return false;
-  }
-
-  latest_version = json.substring(versionIndex + 1, endIndex);
-  
-  // Search for the "firmware_file" key and extract the value
-  int fileIndex = json.indexOf("\"firmware_file\":");
-  if (fileIndex == -1) {
-    Serial.println("Failed to find firmware_file in JSON.");
-    return false;
-  }
-
-  fileIndex = json.indexOf("\"", fileIndex + 15);  // 15 is the length of `"firmware_file":`
-  endIndex = json.indexOf("\"", fileIndex + 1);
-  
-  if (fileIndex == -1 || endIndex == -1) {
-    Serial.println("Failed to extract firmware file name.");
-    return false;
-  }
-
-  firmware_url = json.substring(fileIndex + 1, endIndex);
-
+bool isNewVersionAvailable(String latest_version) {
   // Get stored version from Preferences
-  String current_version = preferences.getString("firmware_version", "1.0.0");
+  preferences.begin("firmware_version", false); //read only 
+  String current_version = preferences.getString("firmware_version", "0.0.0");
 
   Serial.printf("Current Version: %s, Latest Version: %s\n", current_version.c_str(), latest_version.c_str());
 
   // Compare versions
-  return (latest_version > current_version);  // Basic lexicographical comparison
+  return (latest_version > current_version); 
 }
 
-void wifi_firmwareUpdate(void) {
-  const char* metadata_url = "/TimoKropp/OPENCHESSBOARD_WiFi/main_nano_esp32/release/version.json";
 
-  String metadata = fetchLatestVersion(metadata_url);
-  if (metadata.isEmpty()) {
-    Serial.println("Failed to fetch metadata");
-    return;
-  }
 
-  String firmware_url, latest_version;
-  if (!isNewVersionAvailable(metadata, firmware_url, latest_version)) {
-    Serial.println("No new firmware available");
-    return;
-  }
 
-  Serial.printf("New firmware available: %s\n", firmware_url.c_str());
+bool fetchLatestVersion(String& latest_version) {   
+    const char* url = "/TimoKropp/OPENCHESSBOARD_WiFi/main_nano_esp32/release/version.json";
+    const int maxRetries = 3;  // Maximum number of retries for both fetching and writing
+    const unsigned long retryDelay = 5000;  // Delay between retries in milliseconds
+    int fetchRetries = 0;
 
-  // Now download the firmware
-  if (WiFi.status() == WL_CONNECTED) {
+    String metadata;
+
+    while (fetchRetries < maxRetries) {
+        metadata = fetchMetaData(url);
+        if (!metadata.isEmpty()) {
+            break;  // Exit loop if metadata is successfully fetched
+        } else {
+            Serial.println("Failed to fetch metadata, retrying...");
+            fetchRetries++;
+            delay(retryDelay);
+        }
+    }
+
+    if (metadata.isEmpty()) {
+        Serial.println("Failed to fetch metadata after retries");
+        return false;
+    }
+
+    // Search for the "latest_version" key and extract the value
+    int versionIndex = metadata.indexOf("\"latest_version\":");
+    if (versionIndex == -1) {
+      Serial.println("Failed to find latest_version in JSON.");
+      return false;
+    }
+    
+    // Move the index to the value after the colon
+    versionIndex = metadata.indexOf("\"", versionIndex + 17);  // 17 is the length of `"latest_version":`
+    int endIndex = metadata.indexOf("\"", versionIndex + 1);
+    
+    if (versionIndex == -1 || endIndex == -1) {
+      Serial.println("Failed to extract version.");
+      return false;
+    }
+
+    latest_version = metadata.substring(versionIndex + 1, endIndex);
+
+    return latest_version;
+}
+
+bool downloadFirmware(String latest_version) {
+    const int maxRetries = 3;  // Maximum number of retries for both fetching and writing
+    size_t chunkSize = 5120;
+    const int retryDelay = 3000;
+
+
+
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("WiFi not connected");
+        return false;
+    }
+
     WiFiClientSecure client;
     client.setInsecure();
 
-    if (client.connect("raw.githubusercontent.com", 443)) {
-      Serial.println("Connected to server for firmware download");
+    int downloadRetries = 0;
+    size_t totalWritten = 0;
 
-      // Send HTTP GET request for the firmware file
-      client.print(String("GET /TimoKropp/OPENCHESSBOARD_WiFi/main_nano_esp32/release/") + firmware_url + " HTTP/1.1\r\n" +
-                   "Host: raw.githubusercontent.com\r\n" +
-                   "User-Agent: ESP32\r\n" +
-                   "Connection: close\r\n\r\n");
+    size_t currentByte = 0;
+    int contentLength = -1;
 
-      unsigned long timeout = millis();
-      while (client.available() == 0) {
-        if (millis() - timeout > 10000) {  // 10 seconds timeout
-          Serial.println("Timeout waiting for response body");
-          client.stop();
-          return;
-        }
-      }
+    while (downloadRetries < maxRetries) {
+        if (client.connect("raw.githubusercontent.com", 443)) {
+            Serial.println("Connected to server for downloading firmware version: " +  latest_version);
 
-      // Skip HTTP headers
-      while (client.available()) {
-        String line = client.readStringUntil('\n');
-        if (line == "\r") break;
-      }
+            client.print(String("GET /TimoKropp/OPENCHESSBOARD_WiFi/main_nano_esp32/release/") + "firmware_v" + latest_version +".bin"+ " HTTP/1.1\r\n" +
+                         "Host: raw.githubusercontent.com\r\n" +
+                         "User-Agent: ESP32\r\n" +
+                         "Connection: keep-alive\r\n\r\n");
 
-      Serial.println("Start OTA Update");
-      // Start OTA update
-      if (Update.begin(UPDATE_SIZE_UNKNOWN)) {
-        size_t written = 0;
-        while (client.available()) {
-          uint8_t buffer[128];
-          size_t len = client.read(buffer, sizeof(buffer));
-          if (len > 0) {
-            written += Update.write(buffer, len);
-            Serial.printf("Written %d bytes so far\n", written);
-          } else {
-            Serial.println("Error reading data");
-            break;
-          }
-        }
-        Serial.printf("Total written: %d bytes\n", written);
-        if (Update.end() && Update.isFinished()) {
-          Serial.println("Update finished. Rebooting...");
+            unsigned long timeout = millis();
+            while (client.available() == 0) {
+                if (millis() - timeout > 5000) {
+                    Serial.println("Timeout waiting for response body");
+                    client.stop();
+                    break;
+                }
+            }
 
-          // Save the new version to Preferences
-          preferences.putString("firmware_version", latest_version);
-          ESP.restart();
+            String headers;
+            while (client.available()) {
+                String line = client.readStringUntil('\n');
+                //Serial.println(line); //debug header
+                headers += line + "\n";
+                if (line.startsWith("Content-Length: ")) {
+                    contentLength = line.substring(15).toInt();
+                }
+                if (line == "\r") {
+                    break;
+                }
+            }
+
+            if (contentLength <= 0) {
+                Serial.println("Invalid or missing Content-Length header. Aborting.");
+                return false;
+            } else {
+                Serial.printf("Total Content Length: %d bytes\n", contentLength);
+            }
+
+            if (Update.begin(contentLength)) {
+                uint8_t buffer[chunkSize];
+                while (client.connected() && totalWritten < contentLength) {
+                    String rangeHeader = "Range: bytes=" + String(currentByte) + "-" + String(currentByte + chunkSize - 1);
+                    client.print(String("GET /TimoKropp/OPENCHESSBOARD_WiFi/main_nano_esp32/release/") + "firmware_v" + latest_version + " HTTP/1.1\r\n" +
+                                 "Host: raw.githubusercontent.com\r\n" +
+                                 "User-Agent: ESP32\r\n" +
+                                 "Connection: keep-alive\r\n" +
+                                 rangeHeader + "\r\n\r\n");
+
+                    unsigned long timeout = millis();
+                    while (client.available() == 0) {
+                        if (millis() - timeout > 5000) {
+                            Serial.println("Timeout waiting for response body");
+                            client.stop();
+                            break;
+                        }
+                    }
+
+                    size_t len = client.read(buffer, sizeof(buffer));
+                    if (len > 0) {
+                        size_t written = Update.write(buffer, len);
+                        if (written != len) {
+                            Serial.println("Error: Mismatch in written and read data");
+                            break;
+                        }
+                        totalWritten += written;
+                        currentByte += written;
+                        Serial.printf("Written %d/%d bytes\n", totalWritten, contentLength);
+                    } else {
+                        Serial.println("No data available from client. Retrying...");
+                        break;
+                    }
+                }
+
+                if (Update.end() && Update.isFinished()) {
+                    Serial.println("Update finished. Rebooting...");
+                    delay(3000);
+                    preferences.begin("firmware_version", false);
+                    preferences.putString("firmware_version", latest_version);
+                    preferences.end();
+                    ESP.restart();
+                    return true;
+                } else {
+                    Serial.printf("Update failed: %s\n", Update.getError());
+                }
+            } else {
+                Serial.println("Failed to begin update.");
+            }
         } else {
-          Serial.printf("Update failed: %s\n", Update.getError());
+            Serial.println("Failed to connect to server, retrying...");
         }
-      } else {
-        Serial.println("Failed to begin update.");
-      }
+
+        downloadRetries++;
+        delay(retryDelay);
     }
-  }
+
+    return false;
 }
 
+void wifi_firmwareUpdate() {
+    String latest_version; 
+    if (fetchLatestVersion(latest_version)){
+      
+      if (!isNewVersionAvailable(latest_version)) {
+          Serial.println("Firmware is not the latest.");
+          return;
+      }
+      else{
+        Serial.println("Download firmware:" + latest_version);
+        if (!downloadFirmware(latest_version)) {
+            Serial.println("Firmware update failed");
+            return;
+        }
+      }
+
+    }
+    else{
+      Serial.println("No new Version available");
+      return;
+    }
+
+
+}

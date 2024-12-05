@@ -1,5 +1,6 @@
 #pragma once
 #include <Arduino.h>
+#include <FreeRTOS.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include "cert.h"
@@ -14,8 +15,7 @@
 #include <Preferences.h>
 #include "ble_app.h"
 #include "wifi_app.h"
-#include <ArduinoOTA.h>
-#include <esp_ota_ops.h>
+#include <Update.h>
 
 
 // Debug Settings
