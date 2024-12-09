@@ -4,7 +4,7 @@
 
 // Define Wi-Fi AP (Access Point) credentials
 const char* ssidAP = "OPENCHESSBOARD"; // SSID for the ESP32 access point
-const char* passwordAP = "123456789";
+const char* passwordAP = "12345678";
 
 // Create a web server on port 80 (default HTTP port)
 WiFiServer APserver(80);
