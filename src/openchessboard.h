@@ -16,7 +16,6 @@
 #include "wifi_app.h"
 #include <Update.h>
 
-
 // Debug Settings
 //#define MANUAL_MOVE_INPUT
 //#define PLUG_AT_TOP // not fully supported yet
@@ -52,7 +51,7 @@ extern bool is_seeking;
 // Settings object
 extern Preferences preferences;
 
-// wifi  and board variables
+// wifi  and board variablesht
 extern String wifi_ssid;
 extern String wifi_password;
 extern String lichess_api_token;

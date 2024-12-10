@@ -171,4 +171,5 @@ void readBoardSelection(){
   {
     board_startupType = "AP";
   }
+  board_startupType = "AP";
 }

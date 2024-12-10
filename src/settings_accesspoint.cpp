@@ -1,5 +1,5 @@
 #include "openchessboard.h"
-
+#include "html_content.h"
 // Create a web server on port 80 (default HTTP port)
 
 // Define Wi-Fi AP (Access Point) credentials
@@ -10,6 +10,7 @@ const char* passwordAP = "12345678";
 WiFiServer APserver(80);
 
 Preferences preferences;
+
 
 // Function to extract form data from the POST request
 String getFormData(String request, String key) {
@@ -48,12 +49,13 @@ bool handleAPClientRequest(WiFiClient &client) {
   String token = "";
   String gameMode = "";
   String startupType = "";
+
   // Wait for data from the client
   while (client.connected()) {
     if (client.available()) {
       char c = client.read();
       Serial.write(c);  // Optional, to debug the received request
-      
+
       // Read the HTTP request line
       if (c == '\n') {
         // Check for the end of the request header
@@ -62,37 +64,12 @@ bool handleAPClientRequest(WiFiClient &client) {
           client.println("HTTP/1.1 200 OK");
           client.println("Content-Type: text/html");
           client.println("Connection: close");
-          client.println();
+          client.println("");
+          // Serve the HTML content from the string
+          DEBUG_SERIAL.println("HTML CONTENT");
+          DEBUG_SERIAL.println(htmlContent);
+          client.print(htmlContent);  // Use the simple array for HTML content
 
-          // Send the HTML form
-          String html = "<html>\
-                            <body>\
-                              <h2>WiFi Configuration</h2>\
-                              <form action='/submit' method='POST'>\
-                                <label>WiFi SSID:</label><br>\
-                                <input type='text' name='ssid' value='" + ssid + "'><br><br>\
-                                <label>WiFi Password:</label><br>\
-                                <input type='password' name='password' value='" + password + "'><br><br>\
-                                <label>Token:</label><br>\
-                                <input type='text' name='token' value='" + token + "'><br><br>\
-                                <label>Auto Start Game Time Control(WiFi):</label><br>\
-                                <select name='gameMode'>\
-                                  <option value='None'>None</option>\
-                                  <option value='5+3'>5+3</option>\
-                                  <option value='10+5'>10+5</option>\
-                                  <option value='15+10'>15+10</option>\
-                                  <option value='30+20'>30+20</option>\
-                                </select><br><br>\
-                                <label>Default Startup Type:</label><br>\
-                                <select name='startupType'>\
-                                  <option value='WiFi'>WiFi</option>\
-                                  <option value='BLE'>BLE</option>\
-                                </select><br><br>\
-                                <input type='submit' value='Submit'>\
-                              </form>\
-                            </body>\
-                           </html>";
-          client.print(html);
           break;
         } else {
           // Reset current line after reading the header line
@@ -113,7 +90,7 @@ bool handleAPClientRequest(WiFiClient &client) {
         gameMode = getFormData(requestBody, "gameMode");
         startupType = getFormData(requestBody, "startupType");
 
-            // Save to flash
+        // Save to flash
         preferences.begin("settings", false); // read/write
         preferences.putString("ssid", ssid);
         preferences.putString("password", password);
@@ -121,13 +98,6 @@ bool handleAPClientRequest(WiFiClient &client) {
         preferences.putString("gameMode", gameMode);
         preferences.putString("startupType", startupType);
         preferences.end();
-
-        DEBUG_SERIAL.println("Settings Saved to Flash:");
-        DEBUG_SERIAL.println("SSID: " + ssid);
-        DEBUG_SERIAL.println("Password: " + password);
-        DEBUG_SERIAL.println("Token: " + token);
-        DEBUG_SERIAL.println("Game Mode: " + urlDecode(gameMode));
-        DEBUG_SERIAL.println("Startup Type: " + startupType);
 
         // Send a confirmation page
         String confirmation = "<html><body><h2>Settings Saved!</h2>";

@@ -9,6 +9,7 @@ String board_startupType;
 
 void setup() {
 
+
   initHW();
 
   setStateBooting();
@@ -20,7 +21,7 @@ void setup() {
   delay(1000);
   while (!Serial);
 #endif
-
+  
 readSettings();
 readBoardSelection();
 
