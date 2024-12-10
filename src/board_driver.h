@@ -1,5 +1,4 @@
 #pragma once
-#include "openchessboard.h"
 
 extern void initHW(void);
 extern String getMoveInput(void);

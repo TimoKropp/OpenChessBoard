@@ -50,6 +50,11 @@ void run_WiFi_app(void){
     {
         if (board_gameMode != "None"  && !is_seeking){
 
+          DEBUG_SERIAL.println("\nWait for Starting Position");   
+          while(!isStartingPosition()){
+            delay(100);
+          }
+
           DEBUG_SERIAL.println("\nStart Game with prefered settings: "+ board_gameMode);   
           postNewGame(PostClient,  board_gameMode);
 

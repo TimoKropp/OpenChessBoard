@@ -1,5 +1,5 @@
 #pragma once
-#include "OpenChessBoard.h"
+#include "openchessboard.h"
 
 extern void postMove(WiFiClientSecure  &client);
 extern void getStream(WiFiClientSecure  &client);

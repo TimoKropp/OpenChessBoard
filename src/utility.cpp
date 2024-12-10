@@ -126,6 +126,17 @@ void readSettings(void){
   }
   preferences.end();
 }
+bool isStartingPosition(void){
+  byte read_hall_array[8];
+  byte pattern1[8];
+  memset(pattern1, 0xC3, sizeof(pattern1));
+  if (memcmp(read_hall_array, pattern1, 8) == 0){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
 
 void readBoardSelection(){
   byte read_hall_array[8];
