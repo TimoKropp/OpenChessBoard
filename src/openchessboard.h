@@ -19,12 +19,13 @@
 
 // Debug Settings
 //#define MANUAL_MOVE_INPUT
-#define DEBUG true  //set to true for debug output, false for no debug output
+//#define PLUG_AT_TOP // not fully supported yet
+#define DEBUG true  
 #define DEBUG_SERIAL if(DEBUG)Serial
 
 // WiFi variables
 extern int status;
-extern char server[];  // name address for lichess (using DNS)
+extern char server[];  
 
 extern WiFiClientSecure StreamClient;
 extern WiFiClientSecure PostClient;
@@ -48,9 +49,10 @@ extern bool is_connecting;
 extern bool is_game_running;
 extern bool is_seeking;
 
-
+// Settings object
 extern Preferences preferences;
 
+// wifi  and board variables
 extern String wifi_ssid;
 extern String wifi_password;
 extern String lichess_api_token;

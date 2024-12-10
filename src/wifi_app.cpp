@@ -16,8 +16,6 @@ String wifi_password;
 int status = WL_IDLE_STATUS;
 WiFiClientSecure StreamClient;
 WiFiClientSecure PostClient;
-//String rootCA_Github;
-String rootCA_Lichess;
 Ticker timer;
 
 //lichess variables

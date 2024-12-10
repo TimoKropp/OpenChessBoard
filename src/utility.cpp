@@ -1,4 +1,4 @@
-#include "OpenChessBoard.h"
+#include "openchessboard.h"
 /* ---------------------------------------
  *  function to get substring between string firstdel and enddel
  *  @params[in] void
@@ -73,7 +73,6 @@ void setStateConnecting(void){
   myturn = false;
 }
 
-
 void setStatePlaying(void){
   is_seeking = false;    
   is_game_running = true;
@@ -105,9 +104,8 @@ String urlDecode(const String &encoded) {
 
 void readSettings(void){
 
-  preferences.begin("settings", true);  // read only
-  
-  // Check if parameters exist and read from the preferences
+  preferences.begin("settings", true);
+
   if (preferences.isKey("ssid")) {
     wifi_ssid = urlDecode(preferences.getString("ssid", ""));
     wifi_password = urlDecode(preferences.getString("password", ""));
@@ -126,6 +124,7 @@ void readSettings(void){
   }
   preferences.end();
 }
+
 bool isStartingPosition(void){
   byte read_hall_array[8];
   byte pattern1[8];
@@ -148,20 +147,19 @@ void readBoardSelection(){
   memset(pattern3, 0x00, sizeof(pattern2));
 
   pattern1[7] =0xC2; // remove piece on a1 to select this
-
   pattern2[6] =0xC2; // remove piece on b1 to select this
-  
   pattern2[5] =0xC2; // remove piece on c1 to select this
 
   readHall(read_hall_array);
-    Serial.print("read_hall_array: ");
+  DEBUG_SERIAL.print("read_hall_array: ");
+
   for (int i = 0; i < 8; i++) {
-      Serial.print(read_hall_array[i], HEX); // Print each byte in hexadecimal
+      Serial.print(read_hall_array[i], HEX);
       if (i < 8 - 1) {
-          Serial.print(", "); // Add comma between elements
+          DEBUG_SERIAL.print(", "); 
       }
   }
-    Serial.println(); // Newline at the end
+    DEBUG_SERIAL.println(); // Newline at the end
   if (memcmp(read_hall_array, pattern1, 8) == 0){
     board_startupType = "WiFi";
   }

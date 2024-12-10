@@ -122,12 +122,12 @@ bool handleAPClientRequest(WiFiClient &client) {
         preferences.putString("startupType", startupType);
         preferences.end();
 
-        Serial.println("Settings Saved to Flash:");
-        Serial.println("SSID: " + ssid);
-        Serial.println("Password: " + password);
-        Serial.println("Token: " + token);
-        Serial.println("Game Mode: " + urlDecode(gameMode));
-        Serial.println("Startup Type: " + startupType);
+        DEBUG_SERIAL.println("Settings Saved to Flash:");
+        DEBUG_SERIAL.println("SSID: " + ssid);
+        DEBUG_SERIAL.println("Password: " + password);
+        DEBUG_SERIAL.println("Token: " + token);
+        DEBUG_SERIAL.println("Game Mode: " + urlDecode(gameMode));
+        DEBUG_SERIAL.println("Startup Type: " + startupType);
 
         // Send a confirmation page
         String confirmation = "<html><body><h2>Settings Saved!</h2>";
