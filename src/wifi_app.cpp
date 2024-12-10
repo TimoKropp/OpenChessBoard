@@ -9,12 +9,15 @@ bool connect_flipstate = false;
 bool is_connecting = false;
 bool is_game_running = false;
 bool is_seeking = false;
+
 // WiFi, and timer variables
 String wifi_ssid;
 String wifi_password;
 int status = WL_IDLE_STATUS;
 WiFiClientSecure StreamClient;
 WiFiClientSecure PostClient;
+//String rootCA_Github;
+String rootCA_Lichess;
 Ticker timer;
 
 //lichess variables
@@ -34,9 +37,8 @@ void run_WiFi_app(void){
   wifi_setup();
 
   wifi_firmwareUpdate();
-
-  PostClient.setCACert(rootCA);
-  StreamClient.setCACert(rootCA);
+  PostClient.setInsecure();
+  StreamClient.setInsecure();
   DEBUG_SERIAL.println("\nStarting connection to server...");
 
   while (1){

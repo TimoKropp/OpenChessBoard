@@ -3,7 +3,6 @@
 #include <FreeRTOS.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
-#include "cert.h"
 #include "settings.h"
 #include "utility.h"
 #include "timer.h"
