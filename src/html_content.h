@@ -6,21 +6,21 @@ const char htmlContent[] PROGMEM = R"rawliteral(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WiFi Configuration</title>
+  <title>OPENCHESSBOARD CONFIGURATION</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f7fc;
+      background-color: #5c5d5e;
       margin: 0;
       padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;d
+      height: 100vh;
     }
 
     .container {
-      background-color: #ffffff;
+      background-color: #353434;
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       padding: 30px;
@@ -30,14 +30,14 @@ const char htmlContent[] PROGMEM = R"rawliteral(
 
     h2 {
       text-align: center;
-      color: #333;
+      color: #ec8703;
       font-size: 24px;
       margin-bottom: 20px;
     }
 
     label {
       font-size: 16px;
-      color: #555;
+      color: #ec8703;
       margin-bottom: 8px;
       display: block;
     }
@@ -53,7 +53,7 @@ const char htmlContent[] PROGMEM = R"rawliteral(
     }
 
     input[type="submit"] {
-      background-color: #4CAF50;
+      background-color: #ec8703;
       color: white;
       border: none;
       padding: 15px;
@@ -65,7 +65,7 @@ const char htmlContent[] PROGMEM = R"rawliteral(
     }
 
     input[type="submit"]:hover {
-      background-color: #45a049;
+      background-color: #ebca13;
     }
 
     select {
@@ -82,7 +82,7 @@ const char htmlContent[] PROGMEM = R"rawliteral(
 
     .note {
       font-size: 14px;
-      color: #777;
+      color: #ec8703;
       text-align: center;
       margin-top: 20px;
     }
@@ -90,25 +90,25 @@ const char htmlContent[] PROGMEM = R"rawliteral(
 </head>
 <body>
   <div class="container">
-    <h2>WiFi Configuration</h2>
+    <h2>OPENCHESSBOARD CONFIGURATION</h2>
     <form action="/submit" method="POST">
       <div class="form-group">
         <label for="ssid">WiFi SSID:</label>
-        <input type="text" name="ssid" id="ssid" value="{{ssid}}" placeholder="Enter WiFi SSID" required>
+        <input type="text" name="ssid" id="ssid" value="" placeholder="Enter Your WiFi SSID" required>
       </div>
 
       <div class="form-group">
         <label for="password">WiFi Password:</label>
-        <input type="password" name="password" id="password" value="{{password}}" placeholder="Enter WiFi Password" required>
+        <input type="password" name="password" id="password" value="" placeholder="Enter Your WiFi Password" required>
       </div>
 
       <div class="form-group">
-        <label for="token">Token:</label>
-        <input type="text" name="token" id="token" value="{{token}}" placeholder="Enter Token" required>
-      </div>
+        <label for="token">Lichess Token (get it <a href="https://lichess.org/account/oauth/token" target="_blank" style="color: #eaeeea;">here</a>):</label>
+        <input type="text" name="token" id="token" value="" placeholder="Enter Your Lichess Token" required>
+    </div>
 
       <div class="form-group">
-        <label for="gameMode">Auto Start Game Time Control (WiFi):</label>
+        <label for="gameMode">Time Control (WiFi - auto seek):</label>
         <select name="gameMode" id="gameMode">
           <option value="None">None</option>
           <option value="5+3">5+3</option>
