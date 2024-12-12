@@ -100,13 +100,20 @@ bool handleAPClientRequest(WiFiClient &client) {
         preferences.end();
 
         // Send a confirmation page
-        String confirmation = "<html><body><h2>Settings Saved!</h2>";
+        String confirmation = "<html><head><style>\n";
+        confirmation += "body { font-family: Arial, sans-serif; background-color: #5c5d5e; color: #ec8703; text-align: center; padding: 20px; }\n";
+        confirmation += "button { background-color: #ec8703; color: white; border: none; padding: 15px; font-size: 16px; border-radius: 5px; cursor: not-allowed; }\n";
+        confirmation += "</style></head><body>";
+        confirmation += "<h2>Settings Submitted!</h2>";
         confirmation += "<p>SSID: " + ssid + "</p>";
         confirmation += "<p>Password: " + password + "</p>";
         confirmation += "<p>Token: " + token + "</p>";
         confirmation += "<p>Game Mode: " + urlDecode(gameMode) + "</p>";
         confirmation += "<p>Startup Type: " + startupType + "</p>";
+        confirmation += "<p>Restarting the device... Please wait.</p>";
+        confirmation += "<button disabled>Restarting...</button>";
         confirmation += "</body></html>";
+
 
         client.print(confirmation);
         is_submitted = true;
