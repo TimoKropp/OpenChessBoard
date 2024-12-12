@@ -15,6 +15,7 @@
 #include "ble_app.h"
 #include "wifi_app.h"
 #include <Update.h>
+#include <ESPmDNS.h>
 
 // Debug Settings
 //#define MANUAL_MOVE_INPUT

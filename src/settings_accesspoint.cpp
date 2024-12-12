@@ -1,11 +1,12 @@
 #include "openchessboard.h"
 #include "html_content.h"
+
 // Create a web server on port 80 (default HTTP port)
 
 // Define Wi-Fi AP (Access Point) credentials
 const char* ssidAP = "OPENCHESSBOARD"; // SSID for the ESP32 access point
-const char* passwordAP = "12345678";
-
+const char* passwordAP = "";
+const char* domainName = "OPENCHESSBOARD";
 // Create a web server on port 80 (default HTTP port)
 WiFiServer APserver(80);
 
@@ -25,20 +26,32 @@ String getFormData(String request, String key) {
 }
 
 void AP_setup(WiFiServer &APserver) {
-// Start ESP32 in Access Point mode
-  WiFi.softAP(ssidAP, passwordAP);
-  Serial.println("Access Point Started");
-  Serial.print("IP Address: ");
-  Serial.println(WiFi.softAPIP());  // Ensure this is 192.168.4.1
-  
-  // Print the WiFi status to debug
-  delay(1000); // Allow time for initialization
-  Serial.print("WiFi Status: ");
-  Serial.println(WiFi.status());  // Check if the ESP32 is properly running as an AP
-  
-  // Start the server
-  APserver.begin();
-  Serial.println("Web server started, waiting for clients...");
+  // Start ESP32 in Access Point mode
+  if (WiFi.softAP(ssidAP, passwordAP)) {
+    DEBUG_SERIAL.println("Access Point started");
+    DEBUG_SERIAL.print("SSID: ");
+    DEBUG_SERIAL.println(ssidAP);
+
+    // Display IP address
+    IPAddress IP = WiFi.softAPIP();
+    DEBUG_SERIAL.print("AP IP address: ");
+    DEBUG_SERIAL.println(IP);
+
+    // Start the server
+    APserver.begin();
+    DEBUG_SERIAL.println("AP Server started");
+
+    // Initialize mDNS
+    if (MDNS.begin(domainName)) {
+      DEBUG_SERIAL.print("mDNS responder started. Access your device at http://");
+      Serial.print(domainName);
+      DEBUG_SERIAL.println(".local");
+    } else {
+      DEBUG_SERIAL.println("Error setting up mDNS responder!");
+    }
+  } else {
+    DEBUG_SERIAL.println("Failed to start Access Point");
+  }
 }
 
 bool handleAPClientRequest(WiFiClient &client) {
@@ -113,7 +126,6 @@ bool handleAPClientRequest(WiFiClient &client) {
         confirmation += "<p>Restarting the device... Please wait.</p>";
         confirmation += "<button disabled>Restarting...</button>";
         confirmation += "</body></html>";
-
 
         client.print(confirmation);
         is_submitted = true;
