@@ -11,9 +11,7 @@ void setup() {
 
 
   initHW();
-
   setStateBooting();
-  isr_setup();
 
 #if DEBUG == true
   //Initialize DEBUG_SERIAL and wait for port to open:
@@ -26,6 +24,7 @@ readSettings();
 readBoardSelection();
 
 if (board_startupType == "WiFi"){
+  isr_setup();
    DEBUG_SERIAL.println("\nRun WiFi App...");   
    run_WiFi_app();
 }

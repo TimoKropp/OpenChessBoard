@@ -1,12 +1,19 @@
-# What is the OPENCHESSBOARD?
+# The OPENCHESSBOARD - Build your own smart chess board
 The OPENCHESSBOARD is an open-source smart chess board to play online chess on a physical chess board. 
-Check out how it works in this video.<br/>
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/PFouUxKJOSc/0.jpg)](https://www.youtube.com/watch?v=PFouUxKJOSc)
-# OPENCHESSBOARD v2.0
-Currently the board is linked to your account on Lichess.org and directly connects to any ongoing game. You can use the Lichess browser application or your smartphone app to start a game from your account. When the board finds a new ongoing game, the board serves as input device and directly sends the move inputs to the Lichess server over a secure WiFi connection (SSL).
+You can start playing with using the openchessboard hardware from [OPENCHESSBOARD.com](http://openchessboard.com/), or build your own project from scratch and use this code as starting point.
+The firmware for the chessboard aims to be a developer platform so you could easily integrate new game ideas or customize the firmware to your needs.
+
+# Main Features
+You can select between two connectivity modes:
+- **WiFi:**
+You can connect the board directly to the Lichess server and can use the board completely as standaloine device without interaction of third party apps.
+During start-up, the board hosts a WiFi access-point where you can enter your prefered settings and game-mode. Later on the board simply starts a new game with your default time-control.
+<iframe src="/data/access_point.html" width="600" height="400"></iframe>
+
+- **BLE:**
 
 # Requirements
-This project runs on Arduino Nano esp32 with the OPENCHESSBOARD hardware. You can order the PCBA (inlcuding Arduino esp32 (the Nano 33 IoT is also supported)) from [OPENCHESSBOARD.com](http://openchessboard.com/).
+This project runs on Arduino Nano esp32 with the OPENCHESSBOARD hardware.
 
 ## Setup
 ### 1. Download the Arduino IDE

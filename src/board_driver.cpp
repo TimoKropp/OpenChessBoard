@@ -252,6 +252,58 @@ String getMoveInput(void) {
 
 }
 
+inline String getRow(const byte hallBoardState[], int row_index) {
+  String row{};
+  int count = 0;
+  for (int col_index = 0; col_index < 8; col_index++) {
+    int state = bitRead(hallBoardState[row_index], col_index);
+    if (state) {
+      if (count > 0) row += String(count);
+      row += '?';
+      count = 0;
+    }
+    else {
+      count++;
+    }
+  }
+  if (count > 0) row += String(count);
+  return row;
+}
+
+inline String getPiecesPlacement(const byte hallBoardState[]) {
+  String piecesPlacement{};
+
+  for (int row_index = 7; row_index > 0; row_index--) {
+    piecesPlacement += getRow(hallBoardState, row_index);
+    piecesPlacement += '/';
+  }
+  piecesPlacement += getRow(hallBoardState, 0);
+  return piecesPlacement;
+}
+
+String getFen(void) {
+  byte hallBoardState[8];
+  readHall(hallBoardState);
+  return getPiecesPlacement(hallBoardState);
+}
+
+bool areFensSame(const String& peripheralFen, const String& centralFen) {
+  static const String piecesNames = "prbnkqPRBNKQ";
+  if (peripheralFen.length() > centralFen.length()) {
+    return false;
+  }
+  for (int i = 0; i < peripheralFen.length(); i++)
+  {
+    if (peripheralFen[i] == '?') {
+      if (piecesNames.indexOf(centralFen[i]) == -1) {
+        return false;
+      }
+    } else if (peripheralFen[i] != centralFen[i]) {
+      return false;
+    }
+  }
+  return true;
+}
 
 /* ---------------------------------------
  *  Function that clears all LED states.
@@ -401,4 +453,93 @@ void displayArray(byte ledBoardState[]) {
   shiftOut(ledBoardState);
   digitalWrite(LED_LATCH_PIN, 1);
   digitalWrite(LED_OE_N_PIN , 0);
+}
+
+void displayFrame(byte frame[8]) {
+  digitalWrite(LED_OE_N_PIN , 1);
+  digitalWrite(LED_MR_N_PIN, 0);
+  digitalWrite(LED_MR_N_PIN, 1);
+  digitalWrite(LED_LATCH_PIN, 0);
+  shiftOut(frame);
+  digitalWrite(LED_LATCH_PIN, 1);
+  digitalWrite(LED_OE_N_PIN , 0);
+  delay(100);
+}
+
+void displayNewGame(void) {
+  byte step1[8] = {0b00000000, 
+                   0b00000000, 
+                   0b00000000, 
+                   0b00011000, 
+                   0b00011000, 
+                   0b00000000, 
+                   0b00000000, 
+                   0b00000000};
+
+  byte step2[8] = {0b00000000, 
+                   0b00000000, 
+                   0b00000000, 
+                   0b00000000, 
+                   0b00000000, 
+                   0b00000000, 
+                   0b00000000, 
+                   0b00000000};
+
+  displayFrame(step1);
+  delay(80);
+  displayFrame(step2);
+  delay(80);
+  displayFrame(step1);
+  delay(80);
+  displayFrame(step2);
+  delay(80);
+  clearDisplay();
+}
+
+void displayWaitForGame(void) {
+  byte step1[8] = {0b00000000, 
+                   0b00000000, 
+                   0b00000000, 
+                   0b00010000, 
+                   0b00011000, 
+                   0b00000000, 
+                   0b00000000, 
+                   0b00000000};
+
+  byte step2[8] = {0b00000000, 
+                   0b00000000, 
+                   0b00000000, 
+                   0b00011000, 
+                   0b00010000, 
+                   0b00000000, 
+                   0b00000000, 
+                   0b00000000};
+
+  byte step3[8] = {0b00000000, 
+                   0b00000000, 
+                   0b00000000, 
+                   0b00011000, 
+                   0b00001000, 
+                   0b00000000, 
+                   0b00000000, 
+                   0b00000000};
+
+  byte step4[8] = {0b00000000, 
+                   0b00000000, 
+                   0b00000000, 
+                   0b00001000, 
+                   0b00011000, 
+                   0b00000000, 
+                   0b00000000, 
+                   0b00000000};
+          
+  displayFrame(step4);
+  delay(80);
+  displayFrame(step3);
+  delay(80);
+  displayFrame(step2);
+  delay(80);
+  displayFrame(step1);
+  delay(80);
+  clearDisplay();
 }
