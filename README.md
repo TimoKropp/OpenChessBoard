@@ -5,27 +5,25 @@ The firmware for the chessboard aims to be a developer platform so you could eas
 
 # Main Features
 You can select between two connectivity modes:
-- **WiFi:**
+- **WiFi (stand-alone play):**
 You can connect the board directly to the Lichess server and can use the board completely as standaloine device without interaction of third party apps.
 During start-up, the board hosts a WiFi access-point where you can enter your prefered settings and game-mode. Later on the board simply starts a new game with your default time-control.
-<iframe src="/data/access_point.html" width="600" height="400"></iframe>
+[View the Access Point](/data/access_point.html)
 
-- **BLE:**
+<img src="data/ap.png" alt="access point" width="300"/>
+
+- **BLE (app play):**
+You can connect the board directly to the [Blichess App](https://play.google.com/store/search?q=blichess&c=apps&hl=de_CH) which implements bluetooth connectivity in the standard Lichess App. When using bluetooth and the Blichess App, the board is a simple input device and everything else is handled via the app. You simply connect the board in the bluetooth settings of the app and can start playing, analyzing or record offline games played on the board.
+You can checkout this video to see how it works:
+[BLE/App demo](https://www.youtube.com/watch?v=-bQ3twI99CM)
+
+<img src="data/demo.png" alt="access point" width="300"/>
 
 # Requirements
 This project runs on Arduino Nano esp32 with the OPENCHESSBOARD hardware.
 
-## Setup
-### 1. Download the Arduino IDE
-Get the latest version [here](https://www.arduino.cc/en/software).
-### 2. Import .ino files from this repository
-Download this project and import files with the Arduino IDE.
-### 3. Link the OpenChessBoard to your Lichess account
-Generate an API token [here](https://lichess.org/account/oauth/token).
-### 4. Change your login data in settings.h
-Input your personal WiFi login credentials as well as your Lichess token.
 
-## How to play
+# How to play
 ### 1. Blink patterns after power up
 - All LEDs light up simultaneously (Hardware power-up)
 -  a4 blinking (connecting to wifi)
@@ -57,7 +55,13 @@ This means you lost WiFi connection and need to reconnect to WiFi and the ongoin
 The board then reconnects again to the game and starts from the last known position.
 - If you somehow knockover multiple pieces the most simple way is to unplug the board, reset all pieces and then power it up. 
 This process only takes a few seconds and the board reconnects to the game and starts from the last known position.
+# How to support this project?
+You can order the hardware from [OPENCHESSBOARD.com](http://openchessboard.com/) and thereby keeping the project alive. 
+If you simply want to support, please think about becoming a patrion:
+[Become a Patrion](https://openchessboard.zahls.ch/pay?cid=4e8bead9)
+
 # Acknowledgements
 Without Lichess.org and their well documented [open-source API](https://lichess.org/api) this project would not be possible.
-Special thanks to the [Lichess-Link project](https://github.com/Kzra/Lichess-Link): A great introduction on how to implement a lichess-client on Arduino.
+Without the fundamental work of [Włodzimierz Ciesielski (vovagorodok)](https://github.com/vovagorodok) the bluetooth connection would not be possible. 
+
 
