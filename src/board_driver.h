@@ -8,6 +8,7 @@ extern void displayBootWait(void);
 extern void displayConnectWait(void);
 extern void displayArray(void);
 extern void readHall(byte read_hall_array[]);
+extern void displayFrame(byte frame[8]);
 
 extern void displayNewGame(void);
 extern void displayWaitForGame(void);

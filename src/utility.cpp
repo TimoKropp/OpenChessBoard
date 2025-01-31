@@ -110,7 +110,6 @@ void readSettings(void){
     wifi_ssid = urlDecode(preferences.getString("ssid", ""));
     wifi_password = urlDecode(preferences.getString("password", ""));
     lichess_api_token = urlDecode(preferences.getString("token", ""));
-    lichess_api_token = "lip_Mw9rP2ir5k2qhwjFz3gl"; // hardcoded for testing
     board_gameMode = urlDecode(preferences.getString("gameMode", ""));
     board_startupType = preferences.getString("startupType", "");
     DEBUG_SERIAL.println("Settings Loaded from Flash:");
@@ -142,13 +141,19 @@ void readBoardSelection(){
   byte pattern1[8];
   byte pattern2[8];
   byte pattern3[8];
+  byte pattern4[8];
+
   memset(pattern1, 0x00, sizeof(pattern1));
   memset(pattern2, 0x00, sizeof(pattern2));
-  memset(pattern3, 0x00, sizeof(pattern2));
+  memset(pattern3, 0x00, sizeof(pattern3));
+  memset(pattern4, 0x00, sizeof(pattern4));
 
   pattern1[7] =0xC2; // remove piece on a1 to select this
   pattern2[6] =0xC2; // remove piece on b1 to select this
-  pattern2[5] =0xC2; // remove piece on c1 to select this
+  pattern3[5] =0xC2; // remove piece on b1 to select this
+
+  pattern4[0] =0xFF; // place 8 pieces on h column (plug at right)
+  
 
   readHall(read_hall_array);
   DEBUG_SERIAL.print("read_hall_array: ");
@@ -171,5 +176,8 @@ void readBoardSelection(){
   {
     board_startupType = "AP";
   }
-  board_startupType = "BLE"; // hardcoded for testing
+  else if (memcmp(read_hall_array, pattern4, 8) == 0)
+  {
+    board_startupType = "PUZZLE";
+  }
 }

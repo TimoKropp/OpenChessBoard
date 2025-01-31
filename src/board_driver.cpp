@@ -244,7 +244,15 @@ String getMoveInput(void) {
   digitalWrite(LED_LATCH_PIN, 0);
   shiftOut(ledBoardState);
   digitalWrite(LED_LATCH_PIN, 1);
-  digitalWrite(LED_OE_N_PIN , 0);
+
+  if (dimLEDs){
+    analogWrite(LED_OE_N_PIN , 150);
+  }
+  else{
+    digitalWrite(LED_OE_N_PIN , 0);
+  }
+
+
   delay(300);
   #endif
 
@@ -349,7 +357,13 @@ void displayConnectWait(void) {
   digitalWrite(LED_LATCH_PIN, 0);
   shiftOut(connect_led_array);
   digitalWrite(LED_LATCH_PIN, 1);
-  digitalWrite(LED_OE_N_PIN , 0);
+    if (dimLEDs){
+    analogWrite(LED_OE_N_PIN , 150);
+  }
+  else{
+    digitalWrite(LED_OE_N_PIN , 0);
+  }
+
 }
 
 
@@ -423,7 +437,13 @@ void displayBootWait(void) {
   shiftOut(boot_led_array);
   DEBUG_SERIAL.println();
   digitalWrite(LED_LATCH_PIN, 1);  
-  digitalWrite(LED_OE_N_PIN , 0);
+  if (dimLEDs){
+  analogWrite(LED_OE_N_PIN , 150);
+  }
+  else{
+    digitalWrite(LED_OE_N_PIN , 0);
+  }
+
   delay(100);
 }
 
@@ -445,14 +465,26 @@ void displayMove(String last_move) {
   digitalWrite(LED_LATCH_PIN, 0);
   shiftOut(led_test_array);
   digitalWrite(LED_LATCH_PIN, 1);
-  digitalWrite(LED_OE_N_PIN , 0);
+    if (dimLEDs){
+    analogWrite(LED_OE_N_PIN , 150);
+  }
+  else{
+    digitalWrite(LED_OE_N_PIN , 0);
+  }
+
 }
 
 void displayArray(byte ledBoardState[]) {
    digitalWrite(LED_LATCH_PIN, 0);
   shiftOut(ledBoardState);
   digitalWrite(LED_LATCH_PIN, 1);
-  digitalWrite(LED_OE_N_PIN , 0);
+  if (dimLEDs){
+    analogWrite(LED_OE_N_PIN , 150);
+  }
+  else{
+    digitalWrite(LED_OE_N_PIN , 0);
+  }
+
 }
 
 void displayFrame(byte frame[8]) {
@@ -462,7 +494,13 @@ void displayFrame(byte frame[8]) {
   digitalWrite(LED_LATCH_PIN, 0);
   shiftOut(frame);
   digitalWrite(LED_LATCH_PIN, 1);
-  digitalWrite(LED_OE_N_PIN , 0);
+  if (dimLEDs){
+    analogWrite(LED_OE_N_PIN , 150);
+  }
+  else{
+    digitalWrite(LED_OE_N_PIN , 0);
+  }
+
   delay(100);
 }
 

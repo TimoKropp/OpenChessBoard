@@ -32,6 +32,10 @@ else if (board_startupType == "BLE"){
   DEBUG_SERIAL.println("\nRun BLE App...");
   run_BLE_app();
 }
+else if (board_startupType == "PUZZLE"){
+  DEBUG_SERIAL.println("\nRun queen puzzle App...");
+  run_queen_puzzle();
+}
 else{
     DEBUG_SERIAL.println("\nRun Access Point to Fetch Settings...");
     run_APsettings(); // runs until settings are submitted

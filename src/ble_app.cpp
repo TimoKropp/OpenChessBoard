@@ -4,7 +4,6 @@
 #include <BleChessUuids.h>
 #include <BleOtaUuids.h>
 #include <BleChessMultiservice.h>
-
 #define DEVICE_NAME "OCB" // max name size with 128 bit uuid is 11
 
 bool skip_next_send = false;
@@ -178,7 +177,9 @@ void run_BLE_app(){
     DEBUG_SERIAL.println("start BLE polling...");
     first_run = false;
   }
-  BLE.poll();
+  #ifndef USE_NIM_BLE_ARDUINO_LIB
+    BLE.poll();
+  #endif
 
   while(!game_running){
     ArduinoBleOTA.pull();

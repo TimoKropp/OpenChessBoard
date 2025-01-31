@@ -9,6 +9,7 @@ bool connect_flipstate = false;
 bool is_connecting = false;
 bool is_game_running = false;
 bool is_seeking = false;
+bool dimLEDs  = false;
 
 // WiFi, and timer variables
 String wifi_ssid;

@@ -14,13 +14,14 @@
 #include <Preferences.h>
 #include "ble_app.h"
 #include "wifi_app.h"
+#include "puzzle_app.h"
 #include <Update.h>
 #include <ESPmDNS.h>
 
 // Debug Settings
 //#define MANUAL_MOVE_INPUT
 //#define PLUG_AT_TOP // not fully supported yet
-#define DEBUG true  
+#define DEBUG false  
 #define DEBUG_SERIAL if(DEBUG)Serial
 
 // WiFi variables
@@ -48,6 +49,7 @@ extern bool connect_flipstate;
 extern bool is_connecting;
 extern bool is_game_running;
 extern bool is_seeking;
+extern bool dimLEDs;
 
 // Settings object
 extern Preferences preferences;
